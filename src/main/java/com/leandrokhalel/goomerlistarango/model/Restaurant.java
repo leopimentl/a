@@ -1,11 +1,11 @@
 package com.leandrokhalel.goomerlistarango.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -24,9 +24,10 @@ public class Restaurant {
     private String name;
 
     @Embedded
-    private Adress adress;
+    private Address address;
 
     @Lob
+    @JsonIgnore
     private byte[] image;
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)

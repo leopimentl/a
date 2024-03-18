@@ -1,65 +1,79 @@
 package com.leandrokhalel.goomerlistarango.service.impl;
 
-import com.leandrokhalel.goomerlistarango.dto.CreateRestaurantDTO;
-import com.leandrokhalel.goomerlistarango.dto.RestaurantDetails;
-import com.leandrokhalel.goomerlistarango.dto.RestaurantMinView;
-import com.leandrokhalel.goomerlistarango.mapper.OpenningHourMapper;
-import com.leandrokhalel.goomerlistarango.mapper.RestaurantMapper;
-import com.leandrokhalel.goomerlistarango.model.OpeningHour;
 import com.leandrokhalel.goomerlistarango.model.Restaurant;
 import com.leandrokhalel.goomerlistarango.repository.OpeningHourRepository;
 import com.leandrokhalel.goomerlistarango.repository.RestaurantRepository;
 import com.leandrokhalel.goomerlistarango.service.RestaurantService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class RestauranteServiceImpl implements RestaurantService {
 
-    private final RestaurantRepository restaurantRepository;
-    private final RestaurantMapper restaurantMapper;
-    private final OpeningHourRepository openingHourRepository;
-    private final OpenningHourMapper openningHourMapper;
+    private RestaurantRepository restaurantRepo;
+    private OpeningHourRepository openingHourRepo;
 
-    @Override
-    public RestaurantMinView save(CreateRestaurantDTO dto, MultipartFile image) throws IOException {
-
-        Restaurant restaurant = restaurantMapper.map(dto);
-        restaurant.setImage(image.getBytes());
-
-        List<OpeningHour> openingHours = this.openningHourMapper.map(restaurant.getOpeningHours(), restaurant);
-
-        this.restaurantRepository.save(restaurant);
-        this.openingHourRepository.saveAll(openingHours);
-
-        return new RestaurantMinView(restaurant);
+    @Autowired
+    public RestauranteServiceImpl(RestaurantRepository restaurantRepo, OpeningHourRepository openingHourRepo) {
+        this.restaurantRepo = restaurantRepo;
+        this.openingHourRepo = openingHourRepo;
     }
 
     @Override
-    public RestaurantDetails findById(Long id) {
-        return new RestaurantDetails(this.restaurantRepository.findById(id).orElseThrow());
+    @Transactional
+    public Restaurant save(Restaurant restaurant, MultipartFile image) {
+        setImage(restaurant, image);
+
+        restaurant.getOpeningHours()
+                .forEach(oh -> oh.setRestaurant(restaurant));
+
+        return restaurantRepo.save(restaurant);
     }
 
     @Override
-    public Page<RestaurantMinView> findAll(Pageable pageable) {
-        return this.restaurantRepository.findAll(pageable).map(RestaurantMinView::new);
+    @Transactional(readOnly = true)
+    public Restaurant findById(Long id) {
+        return restaurantRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
     }
 
     @Override
-    public void update(Restaurant restaurant) {
-
+    @Transactional(readOnly = true)
+    public Page<Restaurant> findAll(Pageable pageable) {
+        return restaurantRepo.findAll(pageable);
     }
 
     @Override
+    @Transactional
+    public Restaurant update(Long id, Restaurant restaurant) {
+        Restaurant restaurantDB = restaurantRepo.getReferenceById(id);
+        restaurantDB.setName(restaurant.getName());
+        restaurantDB.setAddress(restaurant.getAddress());
+        restaurantDB.setOpeningHours(restaurant.getOpeningHours());
+        return restaurantRepo.save(restaurantDB);
+    }
+
+    @Override
+    @Transactional
     public void deleteById(Long id) {
+        restaurantRepo.deleteById(id);
+    }
 
+    private void setImage(Restaurant restaurant, MultipartFile image) {
+        if (image == null) {
+            throw new RuntimeException("Image is required");
+        }
+        try {
+            restaurant.setImage(image.getBytes());
+        } catch (IOException e) {
+            throw new RuntimeException("Error to read image");
+        }
     }
 }
 

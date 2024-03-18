@@ -1,10 +1,8 @@
 package com.leandrokhalel.goomerlistarango.controller;
 
-import com.leandrokhalel.goomerlistarango.dto.CreateRestaurantDTO;
-import com.leandrokhalel.goomerlistarango.dto.RestaurantMinView;
-import com.leandrokhalel.goomerlistarango.dto.RestaurantDetails;
+import com.leandrokhalel.goomerlistarango.model.Restaurant;
 import com.leandrokhalel.goomerlistarango.service.RestaurantService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -13,35 +11,50 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.IOException;
+import java.net.URI;
 
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/restaurant")
 public class RestaurantController {
 
-    private final RestaurantService restaurantService;
+    private RestaurantService restaurantService;
+
+    @Autowired
+    public RestaurantController(RestaurantService restaurantService) {
+        this.restaurantService = restaurantService;
+    }
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<RestaurantMinView> save(@RequestPart("restaurant") CreateRestaurantDTO dto,
-                                                  @RequestPart("image") MultipartFile file) throws IOException {
+    public ResponseEntity<Restaurant> save(@RequestPart("restaurant") Restaurant restaurant,
+                                           @RequestPart("restaurant-image") MultipartFile restaurantImage) {
 
-        var restaurantMinView = this.restaurantService.save(dto, file);
-        var location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(restaurantMinView.id())
-                .toUri();
+        restaurant = this.restaurantService.save(restaurant, restaurantImage);
 
-        return ResponseEntity.created(location).body(restaurantMinView);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}").buildAndExpand(restaurant.getId()).toUri();
+
+        return ResponseEntity.created(location).body(restaurant);
     }
 
     @GetMapping
-    public ResponseEntity<Page<RestaurantMinView>> findAll(Pageable pageable) {
+    public ResponseEntity<Page<Restaurant>> findAll(Pageable pageable) {
         return ResponseEntity.ok(restaurantService.findAll(pageable));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RestaurantDetails> findById(@PathVariable Long id) {
+    public ResponseEntity<Restaurant> findById(@PathVariable Long id) {
         return ResponseEntity.ok(restaurantService.findById(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Restaurant> update(@PathVariable Long id,
+                                             @RequestBody Restaurant restaurant) {
+        return ResponseEntity.ok(restaurantService.update(id, restaurant));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
+        restaurantService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

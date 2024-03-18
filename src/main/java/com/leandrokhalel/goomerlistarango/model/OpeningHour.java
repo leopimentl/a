@@ -1,5 +1,6 @@
 package com.leandrokhalel.goomerlistarango.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,11 +25,12 @@ public class OpeningHour {
     @Enumerated(EnumType.STRING)
     private DayOfWeek day;
 
-    private LocalTime startTime;
-    private LocalTime endTime;
+    private LocalTime open;
+    private LocalTime close;
 
     @ManyToOne()
     @JoinColumn(name = "restaurant_id")
+    @JsonIgnore
     private Restaurant restaurant;
 
 }
