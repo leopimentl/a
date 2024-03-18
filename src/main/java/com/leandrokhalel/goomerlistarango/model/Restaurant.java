@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Entity(name = "restaurant")
 @Table(name = "restaurant")
@@ -23,10 +26,9 @@ public class Restaurant {
     @Embedded
     private Adress adress;
 
-    @OneToOne
-    @JoinColumn(name = "image_id", referencedColumnName = "id")
-    private Image image;
+    @Lob
+    private byte[] image;
 
-    @Embedded
-    private OpeningHour openingHour;
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
+    private List<OpeningHour> openingHours;
 }
