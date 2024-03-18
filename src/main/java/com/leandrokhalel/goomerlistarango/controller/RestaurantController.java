@@ -2,8 +2,11 @@ package com.leandrokhalel.goomerlistarango.controller;
 
 import com.leandrokhalel.goomerlistarango.dto.CreateRestaurantDTO;
 import com.leandrokhalel.goomerlistarango.dto.RestaurantMinView;
+import com.leandrokhalel.goomerlistarango.dto.RestaurantDetails;
 import com.leandrokhalel.goomerlistarango.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,10 +35,13 @@ public class RestaurantController {
         return ResponseEntity.created(location).body(restaurantMinView);
     }
 
-    @GetMapping("/image/{id}")
-    public ResponseEntity<?> downloadFile(@PathVariable Long id) {
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_PNG)
-                .body(this.restaurantService.findById(id));
+    @GetMapping
+    public ResponseEntity<Page<RestaurantMinView>> findAll(Pageable pageable) {
+        return ResponseEntity.ok(restaurantService.findAll(pageable));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<RestaurantDetails> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(restaurantService.findById(id));
     }
 }

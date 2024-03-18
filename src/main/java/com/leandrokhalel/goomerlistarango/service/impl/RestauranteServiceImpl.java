@@ -1,6 +1,7 @@
 package com.leandrokhalel.goomerlistarango.service.impl;
 
 import com.leandrokhalel.goomerlistarango.dto.CreateRestaurantDTO;
+import com.leandrokhalel.goomerlistarango.dto.RestaurantDetails;
 import com.leandrokhalel.goomerlistarango.dto.RestaurantMinView;
 import com.leandrokhalel.goomerlistarango.mapper.OpenningHourMapper;
 import com.leandrokhalel.goomerlistarango.mapper.RestaurantMapper;
@@ -10,6 +11,8 @@ import com.leandrokhalel.goomerlistarango.repository.OpeningHourRepository;
 import com.leandrokhalel.goomerlistarango.repository.RestaurantRepository;
 import com.leandrokhalel.goomerlistarango.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,13 +43,13 @@ public class RestauranteServiceImpl implements RestaurantService {
     }
 
     @Override
-    public byte[] findById(Long id) {
-        return this.restaurantRepository.findById(id).get().getImage();
+    public RestaurantDetails findById(Long id) {
+        return new RestaurantDetails(this.restaurantRepository.findById(id).orElseThrow());
     }
 
     @Override
-    public void findAll() {
-
+    public Page<RestaurantMinView> findAll(Pageable pageable) {
+        return this.restaurantRepository.findAll(pageable).map(RestaurantMinView::new);
     }
 
     @Override

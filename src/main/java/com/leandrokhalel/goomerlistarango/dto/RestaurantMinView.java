@@ -12,7 +12,7 @@ public record RestaurantMinView(
         String name,
         AdressMinView adress
 ) {
-    public RestaurantMinView(Restaurant restaurant) throws IOException {
+    public RestaurantMinView(Restaurant restaurant) {
         this(restaurant.getId(), restaurant.getName(), new AdressMinView(restaurant.getAdress()));
     }
 
