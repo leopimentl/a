@@ -7,29 +7,32 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.DayOfWeek;
-import java.time.LocalTime;
+import java.math.BigDecimal;
 
-@Entity(name = "opening_hour")
-@Table(name = "opening_hour")
+@Entity(name = "product")
+@Table(name = "product")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OpeningHour {
+public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String name;
+
+    private BigDecimal price;
+
     @Enumerated(EnumType.STRING)
-    private DayOfWeek day;
+    private Category category;
 
-    private LocalTime open;
-    private LocalTime close;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "sale_id", referencedColumnName = "id")
+    private Sale sale;
 
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name = "restaurant_id")
-    @JsonIgnore
     private Restaurant restaurant;
 }

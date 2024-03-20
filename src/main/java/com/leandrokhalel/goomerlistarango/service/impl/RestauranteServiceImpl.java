@@ -33,6 +33,8 @@ public class RestauranteServiceImpl implements RestaurantService {
         restaurant.getOpeningHours()
                 .forEach(oh -> oh.setRestaurant(restaurant));
 
+        openingHourRepo.saveAll(restaurant.getOpeningHours());
+
         return restaurantRepo.save(restaurant);
     }
 

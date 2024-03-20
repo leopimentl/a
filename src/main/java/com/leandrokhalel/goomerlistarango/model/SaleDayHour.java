@@ -10,13 +10,13 @@ import lombok.NoArgsConstructor;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 
-@Entity(name = "opening_hour")
-@Table(name = "opening_hour")
+@Entity(name = "sale_day_hour")
+@Table(name = "sale_day_hour")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OpeningHour {
+public class SaleDayHour {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,10 +26,11 @@ public class OpeningHour {
     private DayOfWeek day;
 
     private LocalTime open;
+
     private LocalTime close;
 
     @ManyToOne()
-    @JoinColumn(name = "restaurant_id")
+    @JoinColumn(name = "sale_id")
     @JsonIgnore
-    private Restaurant restaurant;
+    private Sale sale;
 }
