@@ -4,6 +4,7 @@ import com.leandrokhalel.goomerlistarango.model.Restaurant;
 import com.leandrokhalel.goomerlistarango.repository.OpeningHourRepository;
 import com.leandrokhalel.goomerlistarango.repository.RestaurantRepository;
 import com.leandrokhalel.goomerlistarango.service.RestaurantService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,7 +43,7 @@ public class RestauranteServiceImpl implements RestaurantService {
     @Transactional(readOnly = true)
     public Restaurant findById(Long id) {
         return restaurantRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Restaurant not found"));
     }
 
     @Override
