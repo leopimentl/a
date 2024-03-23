@@ -8,6 +8,6 @@ public record SaleFormData(
         Long productId,
         String description,
         Integer discountPercentage,
-        List<SaleDayHour> saleDayHour
+        List<SaleDayHour> saleDayHours
 ) {
 }

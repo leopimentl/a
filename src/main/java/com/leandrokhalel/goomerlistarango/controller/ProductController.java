@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
+
 @RestController
 @RequestMapping("/product")
 public class ProductController {
@@ -24,9 +26,16 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<Product> save(@RequestBody @Valid ProductFormData data) {
         Product product = productService.save(data);
-        return ResponseEntity
-                .created(ServletUriComponentsBuilder.fromCurrentRequest()
-                        .path("/{id}").buildAndExpand(product.getId()).toUri())
-                .body(product);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}").buildAndExpand(product.getId()).toUri();
+
+        return ResponseEntity.created(location).body(product);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Product> findById(@PathVariable Long id) {
+        Product product = productService.findById(id);
+        return ResponseEntity.ok(product);
     }
 }

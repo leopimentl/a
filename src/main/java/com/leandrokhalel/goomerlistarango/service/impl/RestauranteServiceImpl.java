@@ -59,6 +59,7 @@ public class RestauranteServiceImpl implements RestaurantService {
         restaurantDB.setName(restaurant.getName());
         restaurantDB.setAddress(restaurant.getAddress());
         restaurantDB.setOpeningHours(restaurant.getOpeningHours());
+        restaurantDB.getOpeningHours().forEach(oh -> oh.setRestaurant(restaurantDB));
         return restaurantRepo.save(restaurantDB);
     }
 

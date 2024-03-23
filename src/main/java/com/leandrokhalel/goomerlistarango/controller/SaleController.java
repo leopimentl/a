@@ -5,10 +5,10 @@ import com.leandrokhalel.goomerlistarango.model.Sale;
 import com.leandrokhalel.goomerlistarango.service.SaleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/sale")
@@ -23,6 +23,16 @@ public class SaleController {
 
     @PostMapping
     public ResponseEntity<Sale> save(@RequestBody SaleFormData data) {
-        return ResponseEntity.ok(saleService.save(data));
+        Sale sale = saleService.save(data);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}").buildAndExpand(sale.getId()).toUri();
+
+        return ResponseEntity.created(location).body(sale);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Sale> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(saleService.findById(id));
     }
 }

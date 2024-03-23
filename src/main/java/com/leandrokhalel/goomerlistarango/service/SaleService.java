@@ -5,5 +5,7 @@ import com.leandrokhalel.goomerlistarango.model.Sale;
 
 public interface SaleService {
 
-    public Sale save(SaleFormData data);
+    Sale save(SaleFormData data);
+
+    Sale findById(Long id);
 }
